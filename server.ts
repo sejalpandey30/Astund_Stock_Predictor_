@@ -31,6 +31,26 @@ function getGeminiClient(): GoogleGenAI {
   }
   return aiClient;
 }
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+
+if (!GEMINI_API_KEY) {
+  throw new Error("Missing Gemini API key. Please set GEMINI_API_KEY in environment variables.");
+}
+const response = await fetch("https://api.gemini.com/v1/endpoint", {
+  headers: {
+    "Authorization": `Bearer ${GEMINI_API_KEY}`,
+    "Content-Type": "application/json"
+  },
+  method: "POST",
+  body: JSON.stringify({ /* your request payload */ })
+});
+try {
+  const data = await response.json();
+  console.log("Gemini response:", data);
+} catch (err) {
+  console.error("Gemini API error:", err);
+}
+
 
 // In-memory cache for stock research summaries to avoid rate limits
 interface CacheEntry {
