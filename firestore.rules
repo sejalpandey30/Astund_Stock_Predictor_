@@ -1,0 +1,65 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Portfolio Validation Blueprint
+    function isValidPortfolio(data) {
+      return data.keys().hasAll(['symbol', 'companyName', 'sharesOwned', 'averageBuyPrice', 'addedAt']) 
+        && data.keys().size() == 5
+        && data.symbol is string && data.symbol.size() <= 10 && data.symbol.matches('^[a-zA-Z0-9.\\-]+$')
+        && data.companyName is string && data.companyName.size() <= 150
+        && (data.sharesOwned is int || data.sharesOwned is float) && data.sharesOwned >= 0
+        && (data.averageBuyPrice is int || data.averageBuyPrice is float) && data.averageBuyPrice >= 0
+        && (data.addedAt is int || data.addedAt is float);
+    }
+
+    // Note Validation Blueprint
+    function isValidNote(data) {
+      return data.keys().hasAll(['symbol', 'noteText', 'rating', 'updatedAt'])
+        && data.keys().size() == 4
+        && data.symbol is string && data.symbol.size() <= 10 && data.symbol.matches('^[a-zA-Z0-9.\\-]+$')
+        && data.noteText is string && data.noteText.size() <= 2000
+        && data.rating is int && data.rating >= 1 && data.rating <= 5
+        && (data.updatedAt is int || data.updatedAt is float);
+    }
+
+    // Match patterns for collections
+    match /portfolio/{portfolioId} {
+      allow get, list: if true;
+      allow create: if isValidId(portfolioId) && isValidPortfolio(incoming());
+      allow update: if isValidId(portfolioId) && isValidPortfolio(incoming()) && (
+        incoming().symbol == existing().symbol &&
+        incoming().companyName == existing().companyName
+      );
+      allow delete: if isValidId(portfolioId);
+    }
+
+    match /research_notes/{noteId} {
+      allow get, list: if true;
+      allow create: if isValidId(noteId) && isValidNote(incoming());
+      allow update: if isValidId(noteId) && isValidNote(incoming()) && (
+        incoming().symbol == existing().symbol
+      );
+      allow delete: if isValidId(noteId);
+    }
+
+    // 1. Global Safety Net / Catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+

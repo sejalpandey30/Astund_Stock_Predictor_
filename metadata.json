@@ -1,0 +1,6 @@
+{
+  "name": "AI Stock Research Assistant",
+  "description": "Analyze stocks, summarize earnings, examine financial metrics, and generate AI-driven bull & bear cases.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
