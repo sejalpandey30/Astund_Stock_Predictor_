@@ -3,7 +3,7 @@ import { getFirestore } from "firebase/firestore";
 
 // Config values provisioned dynamically in firebase-applet-config.json
 const firebaseConfig = {
-  apiKey: "AIzaSyAwF8e67NtU6ULw08NZ6b18Ve8XKYU0iVY",
+  apiKey: "api key goes here",
   authDomain: "gen-lang-client-0360636982.firebaseapp.com",
   projectId: "gen-lang-client-0360636982",
   storageBucket: "gen-lang-client-0360636982.firebasestorage.app",
